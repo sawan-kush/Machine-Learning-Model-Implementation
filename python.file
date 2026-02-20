@@ -1,0 +1,82 @@
+"""
+TASK-4: Machine Learning Model Implementation
+Spam Email Detection using Scikit-learn
+"""
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+
+# -----------------------------
+# 1. Create Sample Dataset
+# -----------------------------
+
+data = {
+    "email": [
+        "Congratulations! You won a lottery prize",
+        "Meeting scheduled at 10 AM tomorrow",
+        "Claim your free gift card now",
+        "Project deadline is next week",
+        "Limited time offer, buy now",
+        "Let's have lunch tomorrow"
+    ],
+    "label": [
+        "spam",
+        "ham",
+        "spam",
+        "ham",
+        "spam",
+        "ham"
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# -----------------------------
+# 2. Split Data
+# -----------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    df["email"], df["label"], test_size=0.3, random_state=42
+)
+
+# -----------------------------
+# 3. Convert Text to Numerical Features
+# -----------------------------
+
+vectorizer = TfidfVectorizer()
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# -----------------------------
+# 4. Train Model
+# -----------------------------
+
+model = MultinomialNB()
+model.fit(X_train_tfidf, y_train)
+
+# -----------------------------
+# 5. Predictions
+# -----------------------------
+
+predictions = model.predict(X_test_tfidf)
+
+# -----------------------------
+# 6. Evaluation
+# -----------------------------
+
+print("Accuracy:", accuracy_score(y_test, predictions))
+print("\nClassification Report:\n")
+print(classification_report(y_test, predictions))
+
+# -----------------------------
+# 7. Test Custom Email
+# -----------------------------
+
+sample_email = ["Win a free vacation now"]
+sample_vector = vectorizer.transform(sample_email)
+result = model.predict(sample_vector)
+
+print("\nCustom Email Prediction:", result[0])
